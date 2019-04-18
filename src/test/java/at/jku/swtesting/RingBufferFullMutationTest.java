@@ -1,16 +1,13 @@
 package at.jku.swtesting;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.junit.Test;
+import static org.junit.Assert.*;
 
-public class RingBufferTest {
+public class RingBufferFullMutationTest {
 
 	@Test
 	public void testCapacity() {
@@ -115,6 +112,39 @@ public class RingBufferTest {
 	}
 
 	@Test
+	public void testIsFullForNonFullBuffer() {
+		RingBuffer<String> ringBuffer = new RingBuffer<>(5);
+		
+		// empty
+		assertFalse(ringBuffer.isFull());
+		
+		// partially filled
+		ringBuffer.enqueue("item1");
+		assertFalse(ringBuffer.isFull());
+		
+		// partially filled
+		ringBuffer.dequeue();
+		ringBuffer.enqueue("item1");
+		assertFalse(ringBuffer.isFull());
+
+		// partially filled
+		ringBuffer.enqueue("item2");
+		ringBuffer.enqueue("item3");
+		ringBuffer.enqueue("item4");
+		ringBuffer.enqueue("item5");
+		assertTrue(ringBuffer.isFull());	// added because of mutation testing
+		ringBuffer.dequeue();
+		assertFalse(ringBuffer.isFull());
+		
+		// empty
+		ringBuffer.dequeue();
+		ringBuffer.dequeue();
+		ringBuffer.dequeue();
+		ringBuffer.dequeue();
+		assertFalse(ringBuffer.isFull());
+	}
+	
+	@Test
 	public void testIsFull() {
 		RingBuffer<String> ringBuffer = new RingBuffer<>(5);
 
@@ -144,6 +174,7 @@ public class RingBufferTest {
 	@Test
 	public void testIterator() {
 		RingBuffer<String> ringBuffer = new RingBuffer<>(5);
+		assertFalse(ringBuffer.iterator().hasNext());	// added because of mutation testing
 		boolean hasException = false;
 
 		String[] items = new String[] { "item1", "item2", "item3", "item4", "item5" };
@@ -158,6 +189,7 @@ public class RingBufferTest {
 		while (iterator.hasNext()) {
 			assertEquals(items[i++], iterator.next());
 		}
+		assertEquals(ringBuffer.size(), i);
 		
 		try {
 			iterator.remove();
