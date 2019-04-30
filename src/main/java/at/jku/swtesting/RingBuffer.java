@@ -1,5 +1,6 @@
 package at.jku.swtesting;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -130,6 +131,11 @@ public class RingBuffer<Item> implements Iterable<Item> {
 				throw new NoSuchElementException();
 			return a[i++];
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return Arrays.toString(a);
 	}
 
 }
